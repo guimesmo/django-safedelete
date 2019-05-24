@@ -62,7 +62,7 @@ class SafeDeleteModel(models.Model):
 
     _safedelete_policy = SOFT_DELETE
 
-    deleted = models.DateTimeField(editable=False, null=True)
+    deleted_tmsp = models.DateTimeField("deleted", editable=False, null=True)
 
     objects = SafeDeleteManager()
     all_objects = SafeDeleteAllManager()
@@ -113,7 +113,7 @@ class SafeDeleteModel(models.Model):
         """
         current_policy = force_policy or self._safedelete_policy
 
-        assert self.deleted
+        assert self.deleted_tmsp
         self.save(keep_deleted=False, **kwargs)
 
         if current_policy == SOFT_DELETE_CASCADE:
@@ -138,7 +138,7 @@ class SafeDeleteModel(models.Model):
         elif current_policy == SOFT_DELETE:
 
             # Only soft-delete the object, marking it as deleted.
-            self.deleted = timezone.now()
+            self.deleted_tmsp = timezone.now()
             using = kwargs.get('using') or router.db_for_write(self.__class__, instance=self)
             # send pre_softdelete signal
             pre_softdelete.send(sender=self.__class__, instance=self, using=using)
@@ -167,6 +167,14 @@ class SafeDeleteModel(models.Model):
                     related.delete(force_policy=SOFT_DELETE, **kwargs)
             # soft-delete the object
             self.delete(force_policy=SOFT_DELETE, **kwargs)
+
+    @property
+    def deleted(self):
+        return self.deleted_tmsp
+
+    @deleted.setter
+    def deleted(self, val):
+        self.deleted_tmsp = val
 
     @classmethod
     def has_unique_fields(cls):

@@ -45,8 +45,8 @@ class SafeDeleteAdmin(admin.ModelAdmin):
     undelete_selected_confirmation_template = "safedelete/undelete_selected_confirmation.html"
 
     list_display = ('deleted',)
-    list_filter = ('deleted',)
-    exclude = ('deleted',)
+    list_filter = ('deleted_tmsp',)
+    exclude = ('deleted_tmps',)
     actions = ('undelete_selected',)
 
     class Meta:
@@ -93,7 +93,7 @@ class SafeDeleteAdmin(admin.ModelAdmin):
         assert hasattr(queryset, 'undelete')
 
         # Remove not deleted item from queryset
-        queryset = queryset.filter(deleted__isnull=False)
+        queryset = queryset.filter(deleted_tmsp__isnull=False)
         # Undeletion confirmed
         if request.POST.get('post'):
             n = queryset.count()

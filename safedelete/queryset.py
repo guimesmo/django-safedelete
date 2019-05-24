@@ -106,7 +106,7 @@ class SafeDeleteQueryset(query.QuerySet):
             # QuerySet._fetch_all cannot work with clones.
             self.query.add_q(
                 Q(
-                    deleted__isnull=visibility in (
+                    deleted_tmsp__isnull=visibility in (
                         DELETED_INVISIBLE, DELETED_VISIBLE_BY_FIELD
                     )
                 )
